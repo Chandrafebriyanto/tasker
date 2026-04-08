@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:1337/api',
+  // baseURL: 'http://localhost:1337/api',
+  baseURL: 'https://merry-unelusory-kathline.ngrok-free.dev/',
 });
 
 // Request interceptor — attach JWT token to every request

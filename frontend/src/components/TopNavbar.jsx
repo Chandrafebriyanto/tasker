@@ -16,14 +16,14 @@ export default function TopNavbar() {
     <header className="fixed top-0 right-0 left-64 z-40 flex justify-between items-center px-8 h-16 bg-surface-container-highest/60 backdrop-blur-xl shadow-2xl shadow-black/40 border-b border-outline-variant/10 transition-all duration-300">
       {/* Search */}
       <div className="flex items-center gap-4 flex-1">
-        <div className="relative w-full max-w-md">
+        {/* <div className="relative w-full max-w-md">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
           <input
             type="text"
             className="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-lg pl-10 pr-4 py-1.5 text-sm font-medium text-on-surface placeholder:text-on-surface-variant/50"
             placeholder="Search tasks, courses, or files..."
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Right Section */}

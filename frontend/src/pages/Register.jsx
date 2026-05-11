@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../context/LanguageContext';
 
 export default function Register() {
+  const t = useT();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [studyProgram, setStudyProgram] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register, isAuthenticated } = useAuth();
@@ -20,16 +23,16 @@ export default function Register() {
     setError('');
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError(t('passwordMinLength'));
       return;
     }
 
     setLoading(true);
     try {
-      await register(username, email, password);
+      await register(username, email, password, studyProgram);
       navigate('/');
     } catch (err) {
-      const message = err?.response?.data?.error?.message || 'Registration failed. Please try again.';
+      const message = err?.response?.data?.error?.message || t('registerFailed');
       setError(message);
     } finally {
       setLoading(false);
@@ -51,9 +54,9 @@ export default function Register() {
           <div className="w-12 h-12 ether-gradient rounded-lg mb-6 flex items-center justify-center shadow-2xl shadow-primary/20">
             <span className="material-symbols-outlined text-on-primary text-2xl">checklist</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tighter text-on-surface mb-2">Create Account</h1>
+          <h1 className="text-3xl font-black tracking-tighter text-on-surface mb-2">{t('registerTitle')}</h1>
           <p className="text-on-surface-variant text-sm tracking-tight text-center">
-            Join Precision Tasker and streamline your academic workflow.
+            {t('registerSubtitle')}
           </p>
         </div>
 
@@ -71,11 +74,11 @@ export default function Register() {
           <form className="space-y-5" onSubmit={handleRegister}>
             <div className="space-y-2">
               <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">
-                Username
+                {t('usernameLabel')}
               </label>
               <input
                 className="w-full h-11 bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-on-surface-variant/40"
-                placeholder="Your display name"
+                placeholder={t('usernamePlaceholder')}
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -90,7 +93,7 @@ export default function Register() {
               </label>
               <input
                 className="w-full h-11 bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-on-surface-variant/40"
-                placeholder="name@email.com"
+                placeholder={t('registerEmailPlaceholder')}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -101,17 +104,31 @@ export default function Register() {
 
             <div className="space-y-2">
               <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">
-                Password
+                {t('passwordLabel')}
               </label>
               <input
                 className="w-full h-11 bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-on-surface-variant/40"
-                placeholder="Min. 6 characters"
+                placeholder={t('registerPasswordPlaceholder')}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
                 id="register-password"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">
+                {t('studyProgramLabel')}
+              </label>
+              <input
+                className="w-full h-11 bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-on-surface-variant/40"
+                placeholder={t('studyProgramPlaceholder')}
+                type="text"
+                value={studyProgram}
+                onChange={(e) => setStudyProgram(e.target.value)}
+                id="register-study-program"
               />
             </div>
 
@@ -124,11 +141,11 @@ export default function Register() {
               {loading ? (
                 <>
                   <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                  Creating account...
+                  {t('creatingAccount')}
                 </>
               ) : (
                 <>
-                  Create Workspace
+                  {t('createWorkspace')}
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 </>
               )}
@@ -137,9 +154,9 @@ export default function Register() {
 
           <div className="mt-8 pt-6 border-t border-outline-variant/10 flex flex-col items-center gap-4">
             <p className="text-xs text-on-surface-variant">
-              Already have an account?{' '}
+              {t('alreadyHaveAccount')}{' '}
               <Link className="text-primary font-semibold hover:underline" to="/login">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>
@@ -148,7 +165,7 @@ export default function Register() {
         {/* Footer Tagline */}
         <div className="mt-12 text-center">
           <blockquote className="italic text-on-surface-variant/40 text-sm font-light">
-            "The secret of getting ahead is getting started."
+            {t('registerQuote')}
           </blockquote>
         </div>
       </main>
@@ -156,13 +173,13 @@ export default function Register() {
       {/* Support Links */}
       <footer className="fixed bottom-8 w-full flex justify-center gap-8 px-6">
         <a className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors" href="#">
-          System Status
+          {t('systemStatus')}
         </a>
         <a className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors" href="#">
-          Privacy
+          {t('privacy')}
         </a>
         <a className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors" href="#">
-          Terms
+          {t('terms')}
         </a>
       </footer>
     </div>

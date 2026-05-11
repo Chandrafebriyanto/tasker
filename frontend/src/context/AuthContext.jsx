@@ -42,8 +42,13 @@ export function AuthProvider({ children }) {
     return userData;
   };
 
-  const register = async (username, email, password) => {
-    const res = await api.post('/auth/local/register', { username, email, password });
+  const register = async (username, email, password, studyProgram) => {
+    const res = await api.post('/auth/local/register', {
+      username,
+      email,
+      password,
+      studyProgram: studyProgram || '',
+    });
     const { jwt, user: userData } = res.data;
     localStorage.setItem('jwt', jwt);
     setToken(jwt);

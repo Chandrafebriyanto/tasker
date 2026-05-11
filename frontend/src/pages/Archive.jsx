@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-// import { useAuth } from '../context/AuthContext';
+import { useT } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
 export default function Archive() {
-  // const { user } = useAuth();
+  const t = useT();
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +17,7 @@ export default function Archive() {
     try {
       const res = await api.get('/titles', {
         params: {
-          // 'filters[user][id][$eq]': user?.id,
+          'filters[user][documentId][$eq]': user?.documentId,
           'filters[status_task][$eq]': 'Completed',
           'populate': 'course',
           'pagination[pageSize]': 100,
@@ -46,12 +48,15 @@ export default function Archive() {
   };
 
   const handleDelete = async (task) => {
-    if (!confirm('This will permanently delete this task. Are you sure?')) return;
+    if (!confirm(t('confirmPermanentDelete'))) return;
     try {
-      await api.delete(`/titles${task.documentId}`);
+      // BUG FIX: was missing slash before documentId
+      await api.delete(`/titles/${task.documentId}`);
       await fetchArchived();
     } catch (err) {
-      console.error('Failed to delete task:', err);
+      console.error('Failed to delete task:', err.response?.data || err);
+      const errorMsg = err.response?.data?.error?.message || err.message;
+      alert(`${t('failedDeleteTask')} \n\nDetail: ${errorMsg}`);
     }
   };
 
@@ -79,11 +84,11 @@ export default function Archive() {
     });
 
     const groups = [];
-    if (recent.length > 0) groups.push({ label: 'Recently Completed', tasks: recent });
-    if (lastMonth.length > 0) groups.push({ label: 'Last Month', tasks: lastMonth });
-    if (older.length > 0) groups.push({ label: 'Older', tasks: older, faded: true });
+    if (recent.length > 0) groups.push({ label: t('recentlyCompleted'), tasks: recent });
+    if (lastMonth.length > 0) groups.push({ label: t('lastMonth'), tasks: lastMonth });
+    if (older.length > 0) groups.push({ label: t('older'), tasks: older, faded: true });
     return groups;
-  }, [tasks]);
+  }, [tasks, t]);
 
   // Stats
   const totalCompleted = tasks.length;
@@ -120,7 +125,7 @@ export default function Archive() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
           <span className="material-symbols-outlined text-primary text-4xl animate-spin">progress_activity</span>
-          <p className="text-on-surface-variant text-sm">Loading archive...</p>
+          <p className="text-on-surface-variant text-sm">{t('loading')}</p>
         </div>
       </div>
     );
@@ -131,11 +136,11 @@ export default function Archive() {
       {/* Header Section */}
       <div className="mb-12">
         <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-primary-dim font-bold mb-2 block">
-          History Management
+          {t('historyManagement')}
         </span>
-        <h2 className="text-[3.5rem] font-bold tracking-tighter leading-none mb-4">Archive</h2>
+        <h2 className="text-[3.5rem] font-bold tracking-tighter leading-none mb-4">{t('archiveTitle')}</h2>
         <p className="text-on-surface-variant text-lg max-w-2xl">
-          A complete record of your academic achievements and finished responsibilities.
+          {t('archiveSubtitle')}
         </p>
       </div>
 
@@ -179,20 +184,20 @@ export default function Archive() {
                       <div className="flex items-center gap-4 text-sm text-on-surface-variant flex-wrap">
                         <span className="flex items-center gap-1">
                           <span className="material-symbols-outlined text-[14px]">calendar_today</span>
-                          Completed {task.completedAt
+                          {t('completedOn')} {task.completedAt
                             ? new Date(task.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                             : 'Unknown'}
                         </span>
                         {task.deadline && (
                           <span className="flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px]">schedule</span>
-                            Original due: {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {t('originalDue')} {new Date(task.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </span>
                         )}
                         {task.priority === 'High' && (
                           <span className="flex items-center gap-1 text-tertiary">
                             <span className="material-symbols-outlined text-[14px]">priority_high</span>
-                            High Priority
+                            {t('highPriorityLabel')}
                           </span>
                         )}
                       </div>
@@ -225,9 +230,9 @@ export default function Archive() {
         /* Empty State */
         <div className="flex flex-col items-center justify-center py-32 text-center">
           <span className="material-symbols-outlined text-surface-container-highest text-8xl mb-6">inventory_2</span>
-          <h3 className="text-2xl font-bold text-on-surface-variant">Archive is empty</h3>
+          <h3 className="text-2xl font-bold text-on-surface-variant">{t('archiveEmpty')}</h3>
           <p className="text-on-surface-variant max-w-xs mx-auto mt-2">
-            Tasks you finish will appear here for your records.
+            {t('archiveEmptySubtitle')}
           </p>
         </div>
       )}
@@ -235,16 +240,16 @@ export default function Archive() {
       {/* Bento Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
         <div className="p-8 rounded-2xl bg-surface-container border border-outline-variant/10 flex flex-col justify-between">
-          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">Total Completed</span>
+          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">{t('totalCompleted')}</span>
           <div>
             <span className="text-4xl font-black text-primary">{totalCompleted}</span>
-            <p className="text-on-surface-variant text-sm mt-1">Tasks archived total</p>
+            <p className="text-on-surface-variant text-sm mt-1">{t('tasksArchivedTotal')}</p>
           </div>
         </div>
 
         <div className="p-8 rounded-2xl bg-surface-container border border-outline-variant/10 flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">Course Breakdown</span>
+          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">{t('courseBreakdown')}</span>
           <div className="space-y-3 relative z-10">
             {courseBreakdown.length > 0 ? (
               courseBreakdown.slice(0, 3).map((item) => (
@@ -255,22 +260,22 @@ export default function Archive() {
                   </div>
                   <div className="h-1 bg-surface-container-highest rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary transition-all duration-700"
-                      style={{ width: `${item.percentage}%` }}
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${item.percentage}%`, backgroundColor: '#bdc2ff' }}
                     ></div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-on-surface-variant text-sm">No data yet</p>
+              <p className="text-on-surface-variant text-sm">{t('noDataYet')}</p>
             )}
           </div>
         </div>
 
         <div className="p-8 rounded-2xl bg-surface-container border border-outline-variant/10 flex flex-col justify-between">
-          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">Storage Policy</span>
+          <span className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-bold mb-4">{t('storagePolicy')}</span>
           <p className="text-on-surface-variant text-sm leading-relaxed">
-            Archived tasks are kept indefinitely. Permanent deletion cannot be undone.
+            {t('storagePolicyText')}
           </p>
         </div>
       </div>

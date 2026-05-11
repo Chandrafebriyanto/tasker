@@ -1,15 +1,18 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useT } from '../context/LanguageContext';
 
 export default function Sidebar({ onNewTask }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const t = useT();
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: 'dashboard' },
-    { path: '/tasks', label: 'My Tasks', icon: 'checklist' },
-    { path: '/archive', label: 'Archive', icon: 'archive' },
+    { path: '/', label: t('dashboard'), icon: 'dashboard' },
+    { path: '/tasks', label: t('myTasks'), icon: 'checklist' },
+    { path: '/courses', label: t('myCourses'), icon: 'school' },
+    { path: '/archive', label: t('archive'), icon: 'archive' },
   ];
 
   const handleNewTask = () => {
@@ -25,12 +28,9 @@ export default function Sidebar({ onNewTask }) {
     <aside className="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 px-4 bg-surface-container border-r border-outline-variant/20 z-50">
       {/* Logo Section */}
       <div className="mb-10 px-2 flex items-center gap-3">
-        {/* <div className="w-8 h-8 rounded bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
-          <span className="material-symbols-outlined text-on-primary text-sm">grid_view</span>
-        </div> */}
         <div>
-          <h1 className="text-xl font-bold tracking-tighter text-on-surface">Precision Tasker</h1>
-          <p className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-medium">Student Workspace</p>
+          <h1 className="text-xl font-bold tracking-tighter text-on-surface">{t('appName')}</h1>
+          <p className="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant font-medium">{t('studentWorkspace')}</p>
         </div>
       </div>
 
@@ -40,7 +40,7 @@ export default function Sidebar({ onNewTask }) {
         className="mb-8 mx-2 py-2.5 px-4 bg-primary text-on-primary rounded-md font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-200 active:scale-95"
       >
         <span className="material-symbols-outlined text-[18px]">add</span>
-        New Task
+        {t('newTask')}
       </button>
 
       {/* Navigation */}

@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Sidebar from './components/Sidebar';
 import TopNavbar from './components/TopNavbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ManageTasks from './pages/ManageTasks';
+import ManageCourses from './pages/ManageCourses';
 import Archive from './pages/Archive';
 
 // Protected layout wrapper — shows sidebar + navbar for authenticated users
@@ -38,6 +40,7 @@ function AppLayout() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<ManageTasks />} />
+            <Route path="/courses" element={<ManageCourses />} />
             <Route path="/archive" element={<Archive />} />
           </Routes>
         </div>
@@ -49,16 +52,18 @@ function AppLayout() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <LanguageProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
-          <Route path="/*" element={<AppLayout />} />
-        </Routes>
-      </AuthProvider>
+            {/* Protected routes */}
+            <Route path="/*" element={<AppLayout />} />
+          </Routes>
+        </AuthProvider>
+      </LanguageProvider>
     </Router>
   );
 }
